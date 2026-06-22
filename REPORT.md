@@ -1,6 +1,3 @@
-Here is the entire report optimized specifically for GitHub Markdown compatibility. You can click the **"Copy"** button on the code block below and paste it directly into your `docs/engineering_report.md` or `REPORT.md` file in VS Code!
-
-```markdown
 # Engineering Project Report: End-to-End EMNIST Character Classifier
 **System Architecture, Deep Learning Pipeline, and MLOps Deployment**
 
