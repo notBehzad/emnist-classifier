@@ -1,14 +1,11 @@
----
-title: EMNIST Character Classifier
-emoji: 🧠
-colorFrom: blue
-colorTo: purple
-sdk: docker
-pinned: false
----
 # EMNIST Balanced Character Classifier
 
 A fully-connected neural network that recognizes handwritten characters (digits + letters) in real time, draw in the browser, get a prediction instantly.
+
+---
+
+## Technical Documentation
+For a deep dive into the neural network topology, data augmentation strategies, structural bottlenecks, and container optimization steps, read the full [Engineering Project Report](REPORT.md).
 
 ---
 
