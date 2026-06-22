@@ -1,3 +1,11 @@
+---
+title: EMNIST Character Classifier
+emoji: 🧠
+colorFrom: blue
+colorTo: purple
+sdk: docker
+pinned: false
+---
 # EMNIST Balanced Character Classifier
 
 Predicts a character or digit
