@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNIST Digit Predictor</title>
+    <style>
+        body { font-family: system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
+        .container { text-align: center; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        canvas { border: 2px solid #333; background-color: black; cursor: crosshair; border-radius: 8px; }
+        .controls { margin-top: 1rem; display: flex; gap: 1rem; justify-content: center; }
+        button { padding: 0.6rem 1.2rem; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-clear { background-color: #e4e6eb; color: #050505; }
+        .btn-predict { background-color: #007bff; color: white; }
+        #result { margin-top: 1.5rem; font-size: 1.5rem; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Draw a character or digit</h2>
+    <p>This model does not support a subset of lowercase letters (c, i, j, k, l, m, o, p, s, u, v, w, x, y, z).<br> These letters are intentionally excluded in training due to handwriting ambiguity.</p>
+    <canvas id="drawingCanvas" width="280" height="280"></canvas>
+    
+    <div class="controls">
+        <button class="btn-clear" onclick="clearCanvas()">Clear</button>
+        <button class="btn-predict" onclick="sendPrediction()">Predict Digit</button>
+    </div>
+    
+    <div id="result">Prediction: --</div>
+</div>
+
+<script>
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    // Configure drawing style (White ink on Black background to mimic EMNIST)
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 16;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', () => { isDrawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mouseleave', () => { isDrawing = false; ctx.beginPath(); });
+
+    function draw(e) {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('result').innerText = "Prediction: --";
+    }
+
+    async function sendPrediction() {
+        // 1. Create a hidden, miniature 28x28 canvas to handle downsampling
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 28;
+        tempCanvas.height = 28;
+        const tempCtx = tempCanvas.getContext('2d');
+        
+        // 2. Compress the main canvas drawing into the 28x28 space
+        tempCtx.drawImage(canvas, 0, 0, 28, 28);
+        
+        // 3. Extract raw pixel color structures
+        const imgData = tempCtx.getImageData(0, 0, 28, 28);
+        const data = imgData.data;
+        const grayscalePixels = [];
+
+        // 4. Extract only the alpha/white track channel to represent single channel MNIST values
+        for (let i = 0; i < data.length; i += 4) {
+            // Using the red channel value since white text means Red=255, Green=255, Blue=255
+            grayscalePixels.push(data[i]); 
+        }
+
+        document.getElementById('result').innerText = "Analyzing...";
+
+        try {
+            // 5. POST the payload to the running local FastAPI engine
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pixels: grayscalePixels })
+            });
+            
+            const result = await response.json();
+            if(result.prediction !== undefined) {
+                document.getElementById('result').innerText = `Prediction: ${result.prediction}`;
+            } else {
+                document.getElementById('result').innerText = "Error parsing response";
+            }
+        } catch (error) {
+            document.getElementById('result').innerText = "Server Connection Failed";
+            console.error(error);
+        }
+    }
+</script>
+</body>
+</html>

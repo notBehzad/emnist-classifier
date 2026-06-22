@@ -1,0 +1,12 @@
+# Ignore python cache files
+__pycache__/
+*.pyc
+model/__pycache__/
+
+# Ignore heavy training data and notebooks
+model/data/
+model/train.ipynb
+model/train.py
+
+# Ignore local UI assets (not needed for the running app)
+assets/
