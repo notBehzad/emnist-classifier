@@ -14,7 +14,7 @@ A fully-connected neural network that recognizes handwritten characters (digits 
 
 ## Demo
 
-> `![Demo](assets/demo.gif)`
+![Demo](assets/demo.gif)
 
 ---
 
@@ -86,7 +86,7 @@ emnist-classifier/
 
 Link: https://huggingface.co/spaces/notBehzad/character-classifier
 
-> No retraining needed — pretrained weights are included. To retrain from scratch: `cd model && python train.py`
+> No retraining needed, pretrained weights are included. To retrain from scratch: `cd model && python train.py`
 
 ---
 
