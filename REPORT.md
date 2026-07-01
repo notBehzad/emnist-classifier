@@ -48,7 +48,6 @@ The network is designed as a Multi-Layer Perceptron (MLP) using PyTorch’s obje
   ```python
   device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-```
 
 The network graph is mapped to the device once upon instantiation. During active training iterations, input vectors and target matrices are asynchronously streamed onto the target device buffer inside the batch loop, minimizing bottleneck latency across the PCIe bus.
 
